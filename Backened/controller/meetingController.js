@@ -8,42 +8,66 @@ export const createMeeting = async (req, res) => {
   try {
     const { members, agenda, date, host, emails } = req.body;
 
-    // Ensure the logged-in user information is handled properly
+    // Validate request data
     if (!members || !Array.isArray(members) || members.length === 0) {
-      return res.status(400).json({ message: "Members are required and should be an array." });
+      return res
+        .status(400)
+        .json({ message: "Members are required and should be an array." });
     }
 
     if (!emails || !Array.isArray(emails) || emails.length !== members.length) {
-      return res.status(400).json({ message: "Emails are required and should match the number of members." });
+      return res
+        .status(400)
+        .json({
+          message: "Emails are required and should match the number of members.",
+        });
     }
 
     if (!agenda || !date) {
-      return res.status(400).json({ message: "Agenda and date are required." });
+      return res
+        .status(400)
+        .json({ message: "Agenda and date are required." });
     }
 
-    const meetings = members.map((member, index) => ({
-      member,
+    // Create a single meeting document
+    const meeting = await Meeting.create({
+      members, // Store all members in the meeting
+      emails,  // Store all corresponding emails
       agenda,
       date,
-      host, // Add the host to each meeting record
-      email: emails[index], // Ensure email corresponds with the member
-    }));
+      host,   // Store the host
+    });
 
-    // Insert multiple meeting records
-    await Meeting.insertMany(meetings);
-
-    res.status(201).json({ message: "Meetings created successfully", data: meetings });
+    res
+      .status(201)
+      .json({ message: "Meeting created successfully", data: meeting });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Failed to create meetings", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to create meeting", error: error.message });
   }
 };
 
 
+
 export const getAllMeetings = async (req, res) => {
   try {
-    // Fetch all meetings from the database
-    const meetings = await Meeting.find();
+    // Get the search value from the query parameter or request body
+    const { searchValue } = req.query; // Assuming it comes as a query parameter
+
+    // Build a filter based on the search value
+    const filter = searchValue
+      ? {
+          $or: [
+            { host: { $regex: searchValue, $options: "i" } }, // Case-insensitive match for the host
+            { members: { $regex: searchValue, $options: "i" } }, // Case-insensitive match for members
+          ],
+        }
+      : {}; // No filter if no search value is provided
+
+    // Fetch filtered meetings from the database
+    const meetings = await Meeting.find(filter);
 
     // Respond with the retrieved meetings
     res.status(200).json({
@@ -60,6 +84,7 @@ export const getAllMeetings = async (req, res) => {
     });
   }
 };
+
 
 
 
@@ -121,7 +146,7 @@ export const saveMomContent = async (req, res) => {
 
     const mailOptions = {
       from: "rcrusoe579@gmail.com",
-      to: meeting.email,
+      to: meeting.emails,
       subject: "Updated Minutes of Meeting (MOM)",
       text: "Please find the attached updated MOM.",
       attachments: [
@@ -164,10 +189,10 @@ export const getMomContent = async (req, res) => {
     res.status(200).json({
       message: "MOM content fetched successfully",
       momContent: meeting.momContent || "",
-      member: meeting.member || [], // Include members in the response
+      member: meeting.members || [], // Include members in the response
       agenda: meeting.agenda || "",
       host: meeting.host || "", // Include host in the response
-      email: meeting.email || "",
+      email: meeting.emails || "",
     });
   } catch (error) {
     console.error(error);
@@ -206,15 +231,15 @@ export const sendEmail = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: "your-email@gmail.com",
-        pass: "your-app-password",
+        user: "rcrusoe579@gmail.com",
+        pass: "vjku indt lsrh wbja",
       },
     });
 
     const pdfBuffer = Buffer.from(pdf, "base64");
 
     const mailOptions = {
-      from: "your-email@gmail.com",
+      from: "rcrusoe579@gmail.com",
       to: emails.join(", "),
       subject,
       text: body,

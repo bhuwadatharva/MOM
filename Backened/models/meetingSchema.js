@@ -1,34 +1,16 @@
 import mongoose from "mongoose";
 
-const meetingSchema = new mongoose.Schema({
-  member: {
-    type: [String], // Array of strings
-    
+const MeetingSchema = new mongoose.Schema({
+  members: [String], // Array of usernames
+  emails: [String],  // Array of emails
+  agenda: { type: String, required: true },
+  date: { type: Date, required: true },
+  host: { type: String, required: true },
+  pdf: {
+    type:String,
   },
-  agenda: {
-    type: String,
-   
-  },
-  date: {
-    type: Date,
-    
-  },
-  momContent: {
-    type: String, // The MOM content in HTML or plain text
-    
-  },
-  host: { 
-    type: String,
-
-  },
-  email: {
-    type: [String],
-    unique: true,
-},
-pdf: {
-  type:String,
-},
-
+  
 });
 
-export const Meeting = mongoose.model("Meeting", meetingSchema);
+
+export const Meeting = mongoose.model("Meeting", MeetingSchema);

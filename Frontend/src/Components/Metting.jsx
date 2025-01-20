@@ -14,26 +14,30 @@ function Meeting() {
   const [isLoading, setIsLoading] = useState(false);
 
   const template = (agenda, attendees) => `
-   <h2>Minutes of Meeting</h2>
+    <h2>Minutes of Meeting</h2>
     <p><strong>Date:</strong> ___________</p>
     <p><strong>Time:</strong> ___________</p>
     <p><strong>Attendees:</strong></p>
-    <ul>${attendees.map((member) => `<li>${member}</li>`).join("")}</ul>
+    <ul>
+      ${attendees
+        .map((member, index) => `<li>${index + 1}. ${member}</li>`)
+        .join("")}
+    </ul>
     <p><strong>Agenda:</strong> ${agenda || "_"}</p>
     <p><strong>Discussion Points:</strong></p>
     <ul>
-    <li>________</li>
-    <li>________</li>
-    <li>_________</li>
+      <li>________</li>
+      <li>________</li>
+      <li>_________</li>
     </ul>
     <p><strong>Action Items:</strong></p>
     <ol>
-    <li>_________</li>
-    <li>________</li>
-    <li>_________</li></ol>
+      <li>_________</li>
+      <li>________</li>
+      <li>_________</li>
+    </ol>
     <p><strong>Next Meeting:</strong> ___________</p>
-`;
-
+  `;
 
   useEffect(() => {
     if (meetingId) {

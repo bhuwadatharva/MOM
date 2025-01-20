@@ -11,36 +11,38 @@ const Hero = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchMeetings = async () => {
-      try {
-
-        const response = await fetch(
-          `http://localhost:4000/api/v1/meeting/meetings`, // Pass username as a query parameter
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to fetch meetings");
+    useEffect(() => {
+      const fetchMeetings = async () => {
+        if (!user?.username) {
+          setMeetings([]);
+          setLoading(false);
+          return;
         }
-
-        const data = await response.json();
-        setMeetings(data.data || []);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMeetings();
-  }, [user]);
+  
+        try {
+          setLoading(true);
+          const response = await fetch(
+            `http://localhost:4000/api/v1/meeting/meetings?searchValue=${encodeURIComponent(
+              user.username
+            )}` // Pass username as a query parameter
+          );
+  
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to fetch meetings");
+          }
+  
+          const data = await response.json();
+          setMeetings(data.data || []);
+        } catch (err) {
+          setError(err.message || "An error occurred while fetching meetings.");
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchMeetings();
+    }, [user?.username]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
@@ -57,7 +59,7 @@ const Hero = () => {
         ) : meetings.length === 0 ? (
           <p>No meetings found.</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {meetings.map((meeting) => (
               <div
                 key={meeting._id}
