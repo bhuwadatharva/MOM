@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/userSchema.js";
 
 export const isAuthenticated = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Bearer token
+  const token = req.cookies.token || req.headers.authorization?.split(" ")[1]; // Bearer token
 
   if (!token) {
     return res.status(401).json({ message: "Unauthorized: Token not provided." });

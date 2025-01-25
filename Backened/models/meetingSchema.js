@@ -6,6 +6,7 @@ const MeetingSchema = new mongoose.Schema({
   agenda: { type: String, required: true },
   date: { type: Date, required: true },
   host: { type: String, required: true },
+  momContent: { type: String },
   pdf: {
     type:String,
   },

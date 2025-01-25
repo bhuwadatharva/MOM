@@ -58,11 +58,7 @@ export const loginUser = async (req, res, next) => {
           return next(new ErrorHandler("Invalid username or password.", 401));
       }
 
-      res.status(200).json({
-          success: true,
-          message: "Login successful!",
-          user: { id: user._id, username: user.username, email: user.email, designation: user.designation},
-      });
+      generateToken(user, "Login Successfully!", 201, res);
   } catch (error) {
       console.error("Login error:", error);
       next(new ErrorHandler("Login failed.", 500));

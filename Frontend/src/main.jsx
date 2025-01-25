@@ -4,12 +4,7 @@ import App from "./App.jsx";
 import './index.css';
 
 // Define the context with initial values
-export const Context = createContext({
-  isAuthenticated: false,
-  user: {}, // Default user object
-  setIsAuthenticated: () => {}, // Placeholder function
-  setUser: () => {} // Placeholder function
-});
+export const Context = createContext({isAuthenticated: false});
 
 const AppWrapper = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

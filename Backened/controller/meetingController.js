@@ -179,26 +179,28 @@ export const getMomContent = async (req, res) => {
       return res.status(400).json({ message: "Meeting ID is required." });
     }
 
-    // Find the meeting by its ID
     const meeting = await Meeting.findById(meetingId);
 
     if (!meeting) {
       return res.status(404).json({ message: "Meeting not found." });
     }
 
+    console.log("Meeting Retrieved:", meeting); // Debugging
+
     res.status(200).json({
       message: "MOM content fetched successfully",
       momContent: meeting.momContent || "",
-      member: meeting.members || [], // Include members in the response
+      member: meeting.members || [],
       agenda: meeting.agenda || "",
-      host: meeting.host || "", // Include host in the response
+      host: meeting.host || "",
       email: meeting.emails || "",
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error in getMomContent:", error);
     res.status(500).json({ message: "Failed to fetch MOM content", error: error.message });
   }
 };
+
 
 export const getMeetingDetails = async (req, res) => {
   const { meetingId } = req.params;

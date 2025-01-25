@@ -1,18 +1,15 @@
-import React, { useState, useEffect, createContext } from "react";
+import { useEffect, useContext } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import axios from "axios";
 import Login from "./Components/Login";
 import Hero from "./Components/Hero";
 import "./App.css";
 import Create from "./Components/Create";
-import Meeting from "./Components/Metting";
-
-// Create a Context to manage global user authentication state
-export const Context = createContext();
+import Meeting from "./Components/Meeting"
+import { Context } from "./main";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState({});
+  const { isAuthenticated, setIsAuthenticated,user, setUser } = useContext(Context);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -22,27 +19,26 @@ function App() {
           { withCredentials: true }
         );
         setIsAuthenticated(true);
-        setUser(response.data.user);
+        setUser(response.data.user); // Store user data in Context
       } catch (error) {
         setIsAuthenticated(false);
         setUser({});
       }
     };
-
-    fetchUser(); // fetch the user once when the app starts
-  }, [isAuthenticated]); // Empty dependency array ensures this only runs once on mount
+  
+    fetchUser(); // Fetch user data on app mount
+  }, []);// Empty dependency array ensures this only runs once on mount
 
   return (
     <Router>
-      <Context.Provider value={{ isAuthenticated, setIsAuthenticated, user, setUser }}>
+      {/* <Context.Provider value={{ isAuthenticated, setIsAuthenticated, setUser }}> */}
         <Routes>
-          <Route path="/" element={<Hero />} />
+          <Route path="/" element={isAuthenticated ? <Hero /> : <Login />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/create" element={<Create/>}/>
-          
-          <Route path="/meeting/:id" element={<Meeting/>} />
+          <Route path="/create" element={<Create />} />
+          <Route path="/meeting/:id" element={<Meeting />} />
         </Routes>
-      </Context.Provider>
+      {/* </Context.Provider> */}
     </Router>
   );
 }

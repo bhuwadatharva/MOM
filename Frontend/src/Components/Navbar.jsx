@@ -4,7 +4,7 @@ import Create from "./Create";
 import axios from "axios";
 
 const Navbar = () => {
-  const { user, setIsAuthenticated } = useContext(Context); // Access user data and setter from context
+  const { user, setIsAuthenticated } = useContext(Context); // Access user and setIsAuthenticated from Context
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
@@ -12,7 +12,9 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.get("http://localhost:4000/api/v1/user/logout", {}, { withCredentials: true });
+      await axios.get("http://localhost:4000/api/v1/user/logout", {
+        withCredentials: true,
+      });
       setIsAuthenticated(false); // Set authentication state to false
     } catch (error) {
       console.error("Failed to log out:", error);
@@ -21,6 +23,7 @@ const Navbar = () => {
 
   return (
     <div className="bg-gray-800 text-white py-4 px-6 flex items-center justify-between">
+      {/* User Information */}
       <div className="flex items-center">
         <div className="rounded-full bg-gray-600 h-10 w-10 flex items-center justify-center">
           <span className="text-lg font-bold">
@@ -29,9 +32,11 @@ const Navbar = () => {
         </div>
         <div className="ml-4">
           <p className="font-semibold">{user?.email || "No Email Found"}</p>
-          <p className="text-sm">{user?.designation || "No Designation Found"}</p>
+          
         </div>
       </div>
+
+      {/* Action Buttons */}
       <div className="flex">
         <button
           onClick={handleLogout}
