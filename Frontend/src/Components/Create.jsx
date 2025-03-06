@@ -1,35 +1,35 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
 import Select from "react-select";
-// Assuming you're using Redux for user data
+
 import { Context } from "../main";
 
 const Create = ({ closeModal }) => {
   const [formData, setFormData] = useState({
     agenda: "",
     date: "",
-    teammates: [], // Array to hold selected teammates
+    teammates: [], 
   });
 
-  const [userOptions, setUserOptions] = useState([]); // Options for dropdown
+  const [userOptions, setUserOptions] = useState([]); 
   const [loading, setLoading] = useState(false);
   const { user } = useContext(Context);
 
-  // Fetch all users
+  
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:4000/api/v1/user/getuser"); // Adjust this URL to match your backend
+      const response = await axios.get("http://localhost:4000/api/v1/user/getuser");
 
-      const users = response.data?.data || []; // Default to an empty array if no data is returned
+      const users = response.data?.data || []; 
 
-      // Set options in dropdown format
+      
       if (users.length > 0) {
         const options = users.map((user) => ({
           value: user.username,
           label: `${user.username} (${user.email})`,
-          email: user.email, // Include the email in the option
+          email: user.email, 
         }));
         setUserOptions(options);
       }
@@ -40,29 +40,29 @@ const Create = ({ closeModal }) => {
     }
   };
 
-  // Fetch users when component mounts
+  
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  // Handle form submission
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if teammates are selected
+   
     if (formData.teammates.length === 0) {
       alert("Please select at least one teammate to invite.");
       return;
     }
 
     try {
-      // Map teammates to get their emails as well
+      
       const meetingData = {
-        members: formData.teammates.map((teammate) => teammate.value), // Extract usernames
-        emails: formData.teammates.map((teammate) => teammate.email), // Extract emails
+        members: formData.teammates.map((teammate) => teammate.value), 
+        emails: formData.teammates.map((teammate) => teammate.email), 
         agenda: formData.agenda,
         date: formData.date,
-        host: user?.username, // Add host (logged-in user)
+        host: user?.username, 
       };
 
       const response = await axios.post(
@@ -128,16 +128,16 @@ const Create = ({ closeModal }) => {
             </label>
             <Select
               isMulti
-              options={userOptions} // Pass options here
-              value={formData.teammates} // Ensure this matches the options format
+              options={userOptions} 
+              value={formData.teammates}
               onChange={(selectedOptions) =>
                 setFormData({
                   ...formData,
-                  teammates: selectedOptions || [], // Update state with selected options or an empty array
+                  teammates: selectedOptions || [], 
                 })
               }
               placeholder="Invite Teammates"
-              isLoading={loading} // Show loading spinner while fetching
+              isLoading={loading} 
               className="react-select-container"
               classNamePrefix="react-select"
             />

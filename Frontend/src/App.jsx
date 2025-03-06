@@ -19,26 +19,25 @@ function App() {
           { withCredentials: true }
         );
         setIsAuthenticated(true);
-        setUser(response.data.user); // Store user data in Context
+        setUser(response.data.user); 
       } catch (error) {
         setIsAuthenticated(false);
         setUser({});
       }
     };
   
-    fetchUser(); // Fetch user data on app mount
-  }, []);// Empty dependency array ensures this only runs once on mount
-
+    fetchUser(); 
+  }, []);
   return (
     <Router>
-      {/* <Context.Provider value={{ isAuthenticated, setIsAuthenticated, setUser }}> */}
+      
         <Routes>
           <Route path="/" element={isAuthenticated ? <Hero /> : <Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/create" element={<Create />} />
           <Route path="/meeting/:id" element={<Meeting />} />
         </Routes>
-      {/* </Context.Provider> */}
+    
     </Router>
   );
 }

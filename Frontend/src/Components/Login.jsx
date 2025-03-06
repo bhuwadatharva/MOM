@@ -19,12 +19,12 @@ function Login() {
         { withCredentials: true }
       );
       console.log(username, password);  
-      console.log("Response from server:", response.data); // Log the entire response data
+      console.log("Response from server:", response.data); 
       if (response.data && response.data.user) {
         setIsAuthenticated(true);
         setUser(response.data.user);
   
-        console.log("User data:", response.data); // Log user-specific data
+        console.log("User data:", response.data); 
       // Redirect after login
       } else {
         toast.error("Invalid response format");
