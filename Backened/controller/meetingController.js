@@ -16,26 +16,22 @@ export const createMeeting = async (req, res) => {
     }
 
     if (!emails || !Array.isArray(emails) || emails.length !== members.length) {
-      return res
-        .status(400)
-        .json({
-          message: "Emails are required and should match the number of members.",
-        });
+      return res.status(400).json({
+        message: "Emails are required and should match the number of members.",
+      });
     }
 
     if (!agenda || !date) {
-      return res
-        .status(400)
-        .json({ message: "Agenda and date are required." });
+      return res.status(400).json({ message: "Agenda and date are required." });
     }
 
     // Create a single meeting document
     const meeting = await Meeting.create({
       members, // Store all members in the meeting
-      emails,  // Store all corresponding emails
+      emails, // Store all corresponding emails
       agenda,
       date,
-      host,   // Store the host
+      host, // Store the host
     });
 
     res
@@ -48,8 +44,6 @@ export const createMeeting = async (req, res) => {
       .json({ message: "Failed to create meeting", error: error.message });
   }
 };
-
-
 
 export const getAllMeetings = async (req, res) => {
   try {
@@ -85,15 +79,14 @@ export const getAllMeetings = async (req, res) => {
   }
 };
 
-
-
-
 export const saveMomContent = async (req, res) => {
   try {
     const { meetingId, momContent } = req.body;
 
     if (!meetingId || !momContent) {
-      return res.status(400).json({ message: "Meeting ID and MOM content are required." });
+      return res
+        .status(400)
+        .json({ message: "Meeting ID and MOM content are required." });
     }
 
     const meeting = await Meeting.findById(meetingId);
@@ -140,7 +133,7 @@ export const saveMomContent = async (req, res) => {
       service: "Gmail",
       auth: {
         user: "rcrusoe579@gmail.com",
-        pass: "vjku indt lsrh wbja",
+        pass: "kvlt ssbr rsvj hxuf",
       },
     });
 
@@ -166,10 +159,11 @@ export const saveMomContent = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in saveMomContent:", error);
-    res.status(500).json({ message: "Failed to update MOM content", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to update MOM content", error: error.message });
   }
 };
-
 
 export const getMomContent = async (req, res) => {
   try {
@@ -197,10 +191,11 @@ export const getMomContent = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in getMomContent:", error);
-    res.status(500).json({ message: "Failed to fetch MOM content", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch MOM content", error: error.message });
   }
 };
-
 
 export const getMeetingDetails = async (req, res) => {
   const { meetingId } = req.params;
@@ -217,10 +212,11 @@ export const getMeetingDetails = async (req, res) => {
     res.status(200).json(meeting);
   } catch (error) {
     console.error("Error fetching meeting details:", error);
-    res.status(500).json({ message: "An error occurred while fetching meeting details" });
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching meeting details" });
   }
 };
-
 
 export const sendEmail = async (req, res) => {
   try {
@@ -258,6 +254,8 @@ export const sendEmail = async (req, res) => {
     res.status(200).json({ message: "Email sent successfully." });
   } catch (error) {
     console.error("Error sending email:", error);
-    res.status(500).json({ message: "Failed to send email", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to send email", error: error.message });
   }
 };
