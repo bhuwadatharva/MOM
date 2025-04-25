@@ -9,27 +9,27 @@ const Create = ({ closeModal }) => {
   const [formData, setFormData] = useState({
     agenda: "",
     date: "",
-    teammates: [], 
+    teammates: [],
   });
 
-  const [userOptions, setUserOptions] = useState([]); 
+  const [userOptions, setUserOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const { user } = useContext(Context);
 
-  
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:4000/api/v1/user/getuser");
+      const response = await axios.get(
+        "https://mom-t2in.onrender.com/api/v1/user/getuser"
+      );
 
-      const users = response.data?.data || []; 
+      const users = response.data?.data || [];
 
-      
       if (users.length > 0) {
         const options = users.map((user) => ({
           value: user.username,
           label: `${user.username} (${user.email})`,
-          email: user.email, 
+          email: user.email,
         }));
         setUserOptions(options);
       }
@@ -40,33 +40,29 @@ const Create = ({ closeModal }) => {
     }
   };
 
-  
   useEffect(() => {
     fetchUsers();
   }, []);
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-   
     if (formData.teammates.length === 0) {
       alert("Please select at least one teammate to invite.");
       return;
     }
 
     try {
-      
       const meetingData = {
-        members: formData.teammates.map((teammate) => teammate.value), 
-        emails: formData.teammates.map((teammate) => teammate.email), 
+        members: formData.teammates.map((teammate) => teammate.value),
+        emails: formData.teammates.map((teammate) => teammate.email),
         agenda: formData.agenda,
         date: formData.date,
-        host: user?.username, 
+        host: user?.username,
       };
 
       const response = await axios.post(
-        "http://localhost:4000/api/v1/meeting/create",
+        "https://mom-t2in.onrender.com/api/v1/meeting/create",
         meetingData,
         {
           headers: {
@@ -128,16 +124,16 @@ const Create = ({ closeModal }) => {
             </label>
             <Select
               isMulti
-              options={userOptions} 
+              options={userOptions}
               value={formData.teammates}
               onChange={(selectedOptions) =>
                 setFormData({
                   ...formData,
-                  teammates: selectedOptions || [], 
+                  teammates: selectedOptions || [],
                 })
               }
               placeholder="Invite Teammates"
-              isLoading={loading} 
+              isLoading={loading}
               className="react-select-container"
               classNamePrefix="react-select"
             />

@@ -5,39 +5,38 @@ import Login from "./Components/Login";
 import Hero from "./Components/Hero";
 import "./App.css";
 import Create from "./Components/Create";
-import Meeting from "./Components/Meeting"
+import Meeting from "./Components/Meeting";
 import { Context } from "./main";
 
 function App() {
-  const { isAuthenticated, setIsAuthenticated,user, setUser } = useContext(Context);
+  const { isAuthenticated, setIsAuthenticated, user, setUser } =
+    useContext(Context);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:4000/api/v1/user/me",
+          "https://mom-t2in.onrender.com/api/v1/user/me",
           { withCredentials: true }
         );
         setIsAuthenticated(true);
-        setUser(response.data.user); 
+        setUser(response.data.user);
       } catch (error) {
         setIsAuthenticated(false);
         setUser({});
       }
     };
-  
-    fetchUser(); 
+
+    fetchUser();
   }, []);
   return (
     <Router>
-      
-        <Routes>
-          <Route path="/" element={isAuthenticated ? <Hero /> : <Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/create" element={<Create />} />
-          <Route path="/meeting/:id" element={<Meeting />} />
-        </Routes>
-    
+      <Routes>
+        <Route path="/" element={isAuthenticated ? <Hero /> : <Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/create" element={<Create />} />
+        <Route path="/meeting/:id" element={<Meeting />} />
+      </Routes>
     </Router>
   );
 }

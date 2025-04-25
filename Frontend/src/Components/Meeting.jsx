@@ -45,7 +45,7 @@ function Meeting() {
         setIsLoading(true);
         try {
           const response = await fetch(
-            `http://localhost:4000/api/v1/meeting/get-mom/${meetingId}`,
+            `https://mom-t2in.onrender.com/api/v1/meeting/get-mom/${meetingId}`,
             {
               method: "GET",
               headers: { "Content-Type": "application/json" },
@@ -97,7 +97,7 @@ function Meeting() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:4000/api/v1/meeting/save-mom",
+        "https://mom-t2in.onrender.com/api/v1/meeting/save-mom",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

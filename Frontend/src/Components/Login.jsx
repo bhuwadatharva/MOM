@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { Context } from "../main"; // Assuming Context is defined globally
 
 function Login() {
-  const [username, setUsername] = useState(""); 
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { setIsAuthenticated, setUser } = useContext(Context);
   const navigate = useNavigate();
@@ -14,32 +14,36 @@ function Login() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:4000/api/v1/user/login",
+        "https://mom-t2in.onrender.com/api/v1/user/login",
         { username, password },
         { withCredentials: true }
       );
-      console.log(username, password);  
-      console.log("Response from server:", response.data); 
+      console.log(username, password);
+      console.log("Response from server:", response.data);
       if (response.data && response.data.user) {
         setIsAuthenticated(true);
         setUser(response.data.user);
-  
-        console.log("User data:", response.data); 
-      // Redirect after login
+
+        console.log("User data:", response.data);
+        // Redirect after login
       } else {
         toast.error("Invalid response format");
       }
     } catch (error) {
-      console.error("Error during login:", error.response?.data || error.message);
+      console.error(
+        "Error during login:",
+        error.response?.data || error.message
+      );
       toast.error(error.response?.data?.message || "Login failed. Try again.");
     }
   };
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-200">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
-        <h2 className="text-2xl font-serif text-center text-gray-800 mb-6">Login</h2>
+        <h2 className="text-2xl font-serif text-center text-gray-800 mb-6">
+          Login
+        </h2>
         <form onSubmit={handleLogin}>
           <div className="mb-4">
             <input
