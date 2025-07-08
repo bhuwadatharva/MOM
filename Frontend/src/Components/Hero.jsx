@@ -27,7 +27,7 @@ const Hero = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:4000/api/v1/meeting/meetings?searchValue=${encodeURIComponent(
+          `https://mom-t2in.onrender.com/api/v1/meeting/meetings?searchValue=${encodeURIComponent(
             user.username
           )}`
         );

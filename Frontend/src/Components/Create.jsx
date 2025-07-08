@@ -21,7 +21,7 @@ const Create = ({ closeModal }) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        "http://localhost:4000/api/v1/user/getuser"
+        "https://mom-t2in.onrender.com/api/v1/user/getuser"
       );
       const users = response.data?.data || [];
 
@@ -61,7 +61,7 @@ const Create = ({ closeModal }) => {
       };
 
       const response = await axios.post(
-        "http://localhost:4000/api/v1/meeting/create",
+        "https://mom-t2in.onrender.com/api/v1/meeting/create",
         meetingData,
         { headers: { "Content-Type": "application/json" } }
       );

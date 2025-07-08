@@ -13,7 +13,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.get("http://localhost:4000/api/v1/user/logout", {
+      await axios.get("https://mom-t2in.onrender.com/api/v1/user/logout", {
         withCredentials: true,
       });
       setIsAuthenticated(false);

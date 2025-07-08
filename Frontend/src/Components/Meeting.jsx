@@ -66,7 +66,7 @@ function Meeting() {
         setIsLoading(true);
         try {
           const response = await fetch(
-            `http://localhost:4000/api/v1/meeting/get-mom/${meetingId}`,
+            `https://mom-t2in.onrender.com/api/v1/meeting/get-mom/${meetingId}`,
             {
               method: "GET",
               headers: { "Content-Type": "application/json" },
@@ -118,7 +118,7 @@ function Meeting() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:4000/api/v1/meeting/save-mom",
+        "https://mom-t2in.onrender.com/api/v1/meeting/save-mom",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -149,17 +149,46 @@ function Meeting() {
   const generateReport = async () => {
     setIsLoading(true);
     try {
+      const formattedDate = formatDateTime(date || new Date());
+      const promptText = `
+Please fill in the following HTML template for the Minutes of Meeting, based on the context below.
+
+Context:
+${editorContent}
+
+Template:
+<h2>Minutes of Meeting</h2>
+<p><strong>Date:</strong> ${formattedDate.split(" at ")[0]}</p>
+<p><strong>Time:</strong> ${formattedDate.split(" at ")[1]}</p>
+<p><strong>Attendees:</strong></p>
+<ul>
+  ${members.map((member, i) => `<li>${i + 1}. ${member}</li>`).join("")}
+</ul>
+<p><strong>Agenda:</strong> ${agenda}</p>
+<p><strong>Discussion Points:</strong></p>
+<ul>
+  <li>________</li>
+  <li>________</li>
+  <li>_________</li>
+</ul>
+<p><strong>Action Items:</strong></p>
+<ol>
+  <li>_________</li>
+  <li>________</li>
+  <li>_________</li>
+</ol>
+<p><strong>Next Meeting:</strong> ___________</p>
+
+Replace the underscores with realistic and contextually accurate content.
+`;
+
       const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyBxb77wDyEzM1SbLvCgSKonvtPApnVd8QU",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCfspXguxxI6sfUQ2jko7bTMFV7T6TLSGU",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            contents: [
-              {
-                parts: [{ text: editorContent || template("", [], "") }],
-              },
-            ],
+            contents: [{ parts: [{ text: promptText }] }],
           }),
         }
       );
@@ -171,9 +200,11 @@ function Meeting() {
         setEditorContent(generated);
       } else {
         console.error("Invalid API response format", data);
+        toast.error("Failed to generate structured MOM.");
       }
     } catch (error) {
       console.error("Error generating report:", error);
+      toast.error("Unexpected error during report generation.");
     } finally {
       setIsLoading(false);
     }

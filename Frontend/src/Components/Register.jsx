@@ -30,7 +30,7 @@ const Register = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:4000/api/v1/user/register",
+        "https://mom-t2in.onrender.com/api/v1/user/register",
         formData
       );
       if (res.status === 201) {
