@@ -133,7 +133,7 @@ export const saveMomContent = async (req, res) => {
       service: "Gmail",
       auth: {
         user: "rcrusoe579@gmail.com",
-        pass: "kvlt ssbr rsvj hxuf",
+        pass: "uzpu pgzd olyu zepg",
       },
     });
 

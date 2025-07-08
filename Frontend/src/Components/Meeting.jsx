@@ -2,21 +2,42 @@ import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { toast } from "react-toastify";
 
 function Meeting() {
   const { state } = useLocation();
-  const meetingId = state?.meetingId; // Get meetingId from state
+  const meetingId = state?.meetingId;
+
   const [editorContent, setEditorContent] = useState("");
-  const [members, setMembers] = useState([]); // State for members
-  const [agenda, setAgenda] = useState(""); // State for agenda
+  const [members, setMembers] = useState([]);
+  const [agenda, setAgenda] = useState("");
   const [host, setHost] = useState("");
   const [email, setEmail] = useState("");
+  const [date, setDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const template = (agenda, attendees) => `
+  const formatDateTime = (isoString) => {
+    const dateObj = new Date(isoString);
+    const formattedDate = dateObj.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    const formattedTime = dateObj.toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    return `${formattedDate} at ${formattedTime}`;
+  };
+
+  const template = (agenda, attendees, formattedDateTime) => `
     <h2>Minutes of Meeting</h2>
-    <p><strong>Date:</strong> ___________</p>
-    <p><strong>Time:</strong> ___________</p>
+    <p><strong>Date:</strong> ${
+      formattedDateTime?.split(" at ")[0] || "___________"
+    }</p>
+    <p><strong>Time:</strong> ${
+      formattedDateTime?.split(" at ")[1] || "___________"
+    }</p>
     <p><strong>Attendees:</strong></p>
     <ul>
       ${attendees
@@ -45,7 +66,7 @@ function Meeting() {
         setIsLoading(true);
         try {
           const response = await fetch(
-            `https://mom-t2in.onrender.com/api/v1/meeting/get-mom/${meetingId}`,
+            `http://localhost:4000/api/v1/meeting/get-mom/${meetingId}`,
             {
               method: "GET",
               headers: { "Content-Type": "application/json" },
@@ -54,22 +75,27 @@ function Meeting() {
 
           if (response.ok) {
             const data = await response.json();
-            console.log("Fetched Meeting Data:", data);
-
             setMembers(data.member || []);
             setAgenda(data.agenda || "");
             setHost(data.host || "");
             setEmail(data.email || []);
+            setDate(data.date || "");
 
-            const updatedTemplate = template(data.agenda, data.member);
-            setEditorContent(data.momContent || updatedTemplate);
+            const formattedDate = formatDateTime(data.date || new Date());
+            const filledTemplate = template(
+              data.agenda,
+              data.member,
+              formattedDate
+            );
+
+            setEditorContent(data.momContent || filledTemplate);
           } else {
             console.error("Failed to fetch meeting details");
-            setEditorContent(template("", []));
+            setEditorContent(template("", [], ""));
           }
         } catch (error) {
           console.error("Error while fetching meeting details:", error);
-          setEditorContent(template("", []));
+          setEditorContent(template("", [], ""));
         } finally {
           setIsLoading(false);
         }
@@ -77,27 +103,22 @@ function Meeting() {
 
       fetchMeetingDetails();
     } else {
-      setEditorContent(template("", []));
+      setEditorContent(template("", [], ""));
     }
   }, [meetingId]);
 
   const handleEditorChange = (content) => setEditorContent(content);
 
   const saveMomContent = async () => {
-    if (!meetingId) {
-      alert("Meeting ID is required to save MOM.");
-      return;
-    }
-
-    if (!editorContent) {
-      alert("MOM content cannot be empty.");
+    if (!meetingId || !editorContent) {
+      alert("Meeting ID and MOM content are required.");
       return;
     }
 
     setIsLoading(true);
     try {
       const response = await fetch(
-        "https://mom-t2in.onrender.com/api/v1/meeting/save-mom",
+        "http://localhost:4000/api/v1/meeting/save-mom",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -110,16 +131,16 @@ function Meeting() {
 
       if (response.ok) {
         const result = await response.json();
-        alert("MOM saved and email sent successfully!");
+        toast.success("MOM saved successfully!");
         console.log("Server Response:", result);
       } else {
         const errorData = await response.json();
         console.error("Error saving MOM:", errorData);
-        alert(errorData.message || "Failed to save MOM.");
+        toast.error(errorData.message || "Failed to save MOM.");
       }
     } catch (error) {
       console.error("Error while saving MOM:", error);
-      alert("An unexpected error occurred while saving MOM.");
+      toast.error("An unexpected error occurred while saving MOM.");
     } finally {
       setIsLoading(false);
     }
@@ -136,11 +157,7 @@ function Meeting() {
           body: JSON.stringify({
             contents: [
               {
-                parts: [
-                  {
-                    text: editorContent || template("", []),
-                  },
-                ],
+                parts: [{ text: editorContent || template("", [], "") }],
               },
             ],
           }),
@@ -148,8 +165,10 @@ function Meeting() {
       );
 
       const data = await response.json();
-      if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-        setEditorContent(data.candidates[0].content.parts[0].text);
+      const generated = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (generated) {
+        setEditorContent(generated);
       } else {
         console.error("Invalid API response format", data);
       }
@@ -162,37 +181,51 @@ function Meeting() {
 
   return (
     <div className="min-h-screen flex bg-gray-100">
-      <aside className="w-1/4 bg-gray-200 p-4">
+      {/* Sidebar */}
+      <aside className="w-1/4 bg-white border-r p-6 shadow-md">
         <div className="flex items-center gap-3">
-          <div className="rounded-full bg-gray-600 h-12 w-12 flex justify-center items-center">
-            <span className="text-white text-lg font-bold">P</span>
+          <div className="rounded-full bg-gray-700 h-12 w-12 flex justify-center items-center text-white font-bold text-lg">
+            {host?.charAt(0).toUpperCase() || "H"}
           </div>
           <div>
             <h2 className="text-lg font-semibold">{host}</h2>
-            <p className="text-gray-600 text-sm">Professor</p>
+            <p className="text-gray-500 text-sm">Host</p>
           </div>
         </div>
 
         <div className="mt-6">
-          <h3 className="text-lg font-semibold">Members</h3>
-          <ul className="mt-2">
+          <h3 className="text-lg font-semibold text-black mb-2">Members</h3>
+          <ul className="text-gray-700 space-y-1 text-sm">
             {members.length > 0 ? (
               members.map((member, index) => (
-                <li key={index} className="text-gray-700">
+                <li key={index}>
                   {index + 1}. {member}
                 </li>
               ))
             ) : (
-              <p className="text-gray-600">No members found.</p>
+              <li className="text-gray-500">No members found.</li>
             )}
           </ul>
         </div>
       </aside>
 
+      {/* Main Content */}
       <div className="flex-1 p-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">
+            Meeting: {agenda}
+          </h1>
+          <p className="text-gray-600 font-medium">
+            <span className="font-semibold">Date & Time:</span>{" "}
+            {date ? formatDateTime(date) : "Not Available"}
+          </p>
+        </div>
+
         <ReactQuill
           value={editorContent}
           onChange={handleEditorChange}
+          theme="snow"
+          className="bg-white"
           modules={{
             toolbar: [
               ["bold", "italic", "underline"],
@@ -201,15 +234,16 @@ function Meeting() {
             ],
           }}
         />
-        <div className="mt-6 flex space-x-4">
+
+        <div className="mt-6 flex gap-4">
           <button
-            className="bg-gray-500 text-white px-4 py-2"
+            className="bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-900 transition"
             onClick={saveMomContent}
           >
             Save MOM
           </button>
           <button
-            className="bg-gray-500 text-white px-4 py-2"
+            className="bg-gray-700 text-white px-5 py-2 rounded-lg hover:bg-black transition"
             onClick={generateReport}
           >
             {isLoading ? "Loading..." : "Generate Report"}

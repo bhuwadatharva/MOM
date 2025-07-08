@@ -7,6 +7,9 @@ import "./App.css";
 import Create from "./Components/Create";
 import Meeting from "./Components/Meeting";
 import { Context } from "./main";
+import Register from "./Components/Register";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const { isAuthenticated, setIsAuthenticated, user, setUser } =
@@ -16,7 +19,7 @@ function App() {
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          "https://mom-t2in.onrender.com/api/v1/user/me",
+          "http://localhost:4000/api/v1/user/me",
           { withCredentials: true }
         );
         setIsAuthenticated(true);
@@ -31,11 +34,13 @@ function App() {
   }, []);
   return (
     <Router>
+      <ToastContainer position="top-center" autoClose={3000} />
       <Routes>
         <Route path="/" element={isAuthenticated ? <Hero /> : <Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/create" element={<Create />} />
         <Route path="/meeting/:id" element={<Meeting />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </Router>
   );

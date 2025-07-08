@@ -2,8 +2,9 @@ import { useState, useEffect, useContext } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
 import Select from "react-select";
-
 import { Context } from "../main";
+import { X } from "lucide-react"; // optional close icon
+import { toast } from "react-toastify";
 
 const Create = ({ closeModal }) => {
   const [formData, setFormData] = useState({
@@ -20,9 +21,8 @@ const Create = ({ closeModal }) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        "https://mom-t2in.onrender.com/api/v1/user/getuser"
+        "http://localhost:4000/api/v1/user/getuser"
       );
-
       const users = response.data?.data || [];
 
       if (users.length > 0) {
@@ -46,7 +46,6 @@ const Create = ({ closeModal }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (formData.teammates.length === 0) {
       alert("Please select at least one teammate to invite.");
       return;
@@ -62,17 +61,14 @@ const Create = ({ closeModal }) => {
       };
 
       const response = await axios.post(
-        "https://mom-t2in.onrender.com/api/v1/meeting/create",
+        "http://localhost:4000/api/v1/meeting/create",
         meetingData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        { headers: { "Content-Type": "application/json" } }
       );
 
       if (response.status === 201) {
         console.log("Meeting created successfully:", response.data);
+        toast.success("Meeting created successfully!");
         closeModal();
       }
     } catch (error) {
@@ -81,78 +77,73 @@ const Create = ({ closeModal }) => {
   };
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-md p-6 w-96 relative">
-        <div className="text-center mb-6">
-          <h2 className="text-xl font-semibold">Create Meeting</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 backdrop-blur-sm">
+      <div className="bg-white/90 rounded-xl shadow-xl p-6 w-full max-w-md relative border border-gray-200">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-800">
+            Create a New Meeting
+          </h2>
+          <button
+            onClick={closeModal}
+            className="text-gray-600 hover:text-red-500 transition"
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="agenda" className="sr-only">
-              Agenda
-            </label>
-            <input
-              type="text"
-              id="agenda"
-              name="agenda"
-              value={formData.agenda}
-              onChange={(e) =>
-                setFormData({ ...formData, agenda: e.target.value })
-              }
-              placeholder="Agenda"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="date" className="sr-only">
-              Date
-            </label>
-            <input
-              type="datetime-local"
-              id="date"
-              name="date"
-              value={formData.date}
-              onChange={(e) =>
-                setFormData({ ...formData, date: e.target.value })
-              }
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500"
-            />
-          </div>
-          <div className="mb-6">
-            <label htmlFor="teammates" className="sr-only">
-              Invite Teammates
-            </label>
-            <Select
-              isMulti
-              options={userOptions}
-              value={formData.teammates}
-              onChange={(selectedOptions) =>
-                setFormData({
-                  ...formData,
-                  teammates: selectedOptions || [],
-                })
-              }
-              placeholder="Invite Teammates"
-              isLoading={loading}
-              className="react-select-container"
-              classNamePrefix="react-select"
-            />
-          </div>
-          <div className="text-center">
-            <button
-              type="submit"
-              className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition"
-            >
-              Submit
-            </button>
-          </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            name="agenda"
+            placeholder="Meeting Agenda"
+            value={formData.agenda}
+            onChange={(e) =>
+              setFormData({ ...formData, agenda: e.target.value })
+            }
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none"
+            required
+          />
+
+          <input
+            type="datetime-local"
+            name="date"
+            value={formData.date}
+            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none"
+            required
+          />
+
+          <Select
+            isMulti
+            isLoading={loading}
+            options={userOptions}
+            value={formData.teammates}
+            onChange={(selectedOptions) =>
+              setFormData({ ...formData, teammates: selectedOptions || [] })
+            }
+            placeholder="Invite Teammates"
+            className="react-select-container"
+            classNamePrefix="react-select"
+            theme={(theme) => ({
+              ...theme,
+              borderRadius: 6,
+              colors: {
+                ...theme.colors,
+                primary25: "#f3f4f6", // light hover
+                primary: "#000000", // black focus
+              },
+            })}
+          />
+
+          <button
+            type="submit"
+            className="w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition font-medium"
+          >
+            Submit
+          </button>
         </form>
-        <button
-          onClick={closeModal}
-          className="absolute top-2 right-2 text-black font-semibold"
-        >
-          Close
-        </button>
       </div>
     </div>,
     document.body

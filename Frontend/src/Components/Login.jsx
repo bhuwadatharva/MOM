@@ -14,18 +14,18 @@ function Login() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "https://mom-t2in.onrender.com/api/v1/user/login",
+        "http://localhost:4000/api/v1/user/login",
         { username, password },
         { withCredentials: true }
       );
-      console.log(username, password);
       console.log("Response from server:", response.data);
       if (response.data && response.data.user) {
         setIsAuthenticated(true);
         setUser(response.data.user);
+        toast.success("Login successful");
 
-        console.log("User data:", response.data);
-        // Redirect after login
+        // Redirect to home page
+        navigate("/");
       } else {
         toast.error("Invalid response format");
       }
@@ -39,9 +39,9 @@ function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-200">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
-        <h2 className="text-2xl font-serif text-center text-gray-800 mb-6">
+    <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm border border-black">
+        <h2 className="text-2xl font-semibold text-center text-black mb-6">
           Login
         </h2>
         <form onSubmit={handleLogin}>
@@ -51,7 +51,7 @@ function Login() {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white text-black"
               required
             />
           </div>
@@ -61,17 +61,23 @@ function Login() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              className="w-full px-4 py-2 border border-black rounded-lg focus:outline-none focus:ring-2 focus:ring-black bg-white text-black"
               required
             />
           </div>
           <button
             type="submit"
-            className="w-full py-2 bg-gray-200 text-black rounded-lg hover:bg-black hover:text-white transition"
+            className="w-full py-2 bg-black text-white rounded-lg hover:bg-gray-800 hover:text-slate-300 hover:border hover:border-black transition"
           >
             Login
           </button>
         </form>
+        <p className="text-center text-sm text-gray-600 mt-4">
+          Don't have an account?{" "}
+          <a href="/register" className="text-black font-semibold">
+            Register
+          </a>
+        </p>
       </div>
     </div>
   );

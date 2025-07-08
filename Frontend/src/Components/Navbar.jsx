@@ -1,10 +1,11 @@
 import { useState, useContext } from "react";
-import { Context } from "../main"; // Import the context
+import { Context } from "../main";
 import Create from "./Create";
 import axios from "axios";
+import { PlusCircle, LogOut } from "lucide-react"; // Optional icons
 
 const Navbar = () => {
-  const { user, setIsAuthenticated } = useContext(Context); // Access user and setIsAuthenticated from Context
+  const { user, setIsAuthenticated } = useContext(Context);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
@@ -12,47 +13,54 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.get("https://mom-t2in.onrender.com/api/v1/user/logout", {
+      await axios.get("http://localhost:4000/api/v1/user/logout", {
         withCredentials: true,
       });
-      setIsAuthenticated(false); // Set authentication state to false
+      setIsAuthenticated(false);
+      toast.success("Logged out successfully");
+      closeModal(); // Close modal if open
     } catch (error) {
       console.error("Failed to log out:", error);
+      toast.error("Failed to log out");
     }
   };
 
   return (
-    <div className="bg-gray-800 text-white py-4 px-6 flex items-center justify-between">
-      {/* User Information */}
-      <div className="flex items-center">
-        <div className="rounded-full bg-gray-600 h-10 w-10 flex items-center justify-center">
-          <span className="text-lg font-bold">
+    <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-4 px-6 flex items-center justify-between shadow-md">
+      {/* User Avatar & Info */}
+      <div className="flex items-center space-x-4">
+        <div className="rounded-full bg-white h-10 w-10 flex items-center justify-center border-2 border-black shadow">
+          <span className="text-black font-bold text-lg">
             {user?.email?.charAt(0).toUpperCase() || "U"}
           </span>
         </div>
-        <div className="ml-4">
-          <p className="font-semibold">{user?.email || "No Email Found"}</p>
+        <div>
+          <p className="font-semibold text-white text-sm md:text-base">
+            {user?.email || "No Email Found"}
+          </p>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex">
+      {/* Buttons */}
+      <div className="flex space-x-4">
         <button
           onClick={handleLogout}
-          className="bg-white px-4 py-2 rounded-lg text-black mr-10"
+          className="flex items-center bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-black hover:text-white border transition-all duration-200"
         >
+          <LogOut className="w-4 h-4 mr-2" />
           Log Out
         </button>
 
         <button
           onClick={openModal}
-          className="bg-white px-4 py-2 rounded-lg text-black"
+          className="flex items-center bg-white text-black px-4 py-2 rounded-lg font-semibold hover:bg-black hover:text-white border transition-all duration-200"
         >
-          Create a New Meeting
+          <PlusCircle className="w-4 h-4 mr-2" />
+          Create New
         </button>
       </div>
 
-      {/* Conditionally render the Create modal */}
+      {/* Modal */}
       {isModalOpen && <Create closeModal={closeModal} />}
     </div>
   );
